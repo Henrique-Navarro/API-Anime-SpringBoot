@@ -5,6 +5,7 @@ import com.api.anime.requests.AnimePostRequestBody;
 import com.api.anime.requests.AnimePutRequestBody;
 import com.api.anime.service.AnimeService;
 import com.api.anime.util.DateUtil;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,13 @@ public class AnimeController {
         return new ResponseEntity<>(animeService.findById(id), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/name/{name}")
+    public ResponseEntity<List<Anime>> findByName(@PathVariable String name) {
+        return new ResponseEntity<>(animeService.findByName(name), HttpStatus.OK);
+    }
+    
     @PostMapping(path = "/add")
-    public ResponseEntity<Anime> save(@RequestBody AnimePostRequestBody animePostRequestBody) {
+    public ResponseEntity<Anime> save(@RequestBody @Valid AnimePostRequestBody animePostRequestBody) {
         return new ResponseEntity<>(animeService.save(animePostRequestBody), HttpStatus.CREATED);
     }
 

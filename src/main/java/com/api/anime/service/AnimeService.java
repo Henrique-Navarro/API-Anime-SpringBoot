@@ -1,9 +1,12 @@
 package com.api.anime.service;
 
 import com.api.anime.domain.Anime;
+import com.api.anime.exception.BadRequestException;
+import com.api.anime.mapper.AnimeMapper;
 import com.api.anime.repository.AnimeRepository;
 import com.api.anime.requests.AnimePostRequestBody;
 import com.api.anime.requests.AnimePutRequestBody;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,11 +30,16 @@ public class AnimeService {
     public Anime findById(Long id) {
         return animeRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Anime not found"));
+                .orElseThrow(() -> new BadRequestException("Anime not found"));
     }
 
+    public List<Anime> findByName(String name) {
+        return animeRepository.findByName(name);
+    }
+
+    @Transactional
     public Anime save(AnimePostRequestBody animePostRequestBody) {
-        return animeRepository.save(Anime.builder().name(animePostRequestBody.getName()).build());
+        return animeRepository.save(AnimeMapper.INSTANCE.toAnime(animePostRequestBody));
     }
 
     public void delete(Long id) {
@@ -39,11 +47,9 @@ public class AnimeService {
     }
 
     public void replace(AnimePutRequestBody animePutRequestBody) {
-        findById(animePutRequestBody.getId());
-        Anime anime = Anime.builder()
-                .id(animePutRequestBody.getId())
-                .name(animePutRequestBody.getName())
-                .build();
+        Anime savedAnime = findById(animePutRequestBody.getId());
+        Anime anime = AnimeMapper.INSTANCE.toAnime(animePutRequestBody);
+        anime.setId(savedAnime.getId());
         animeRepository.save(anime);
     }
 }

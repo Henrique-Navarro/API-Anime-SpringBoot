@@ -7,4 +7,5 @@ import java.util.List;
 
 //CLASSE QUE REPRESENTA A LIGAÇÃO DIRETA COM O BANCO DE DADOS
 public interface AnimeRepository extends JpaRepository<Anime, Long> {
+    List<Anime> findByName(String name);
 }
